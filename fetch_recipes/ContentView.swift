@@ -14,6 +14,7 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
+            
             List(viewModel.desserts, id: \.self) { dessert in
                 NavigationLink(destination: DetailView(dessert: dessert, viewModel: viewModel)) {
                     HStack {
@@ -46,8 +47,18 @@ struct DetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading) {
                 if let meal = viewModel.selectedMealDetail {
+                    HStack {
+                        Spacer()
+                        Text(meal.strMeal)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding(.top)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                        Spacer()
+                    }
                     
                     if let url = URL(string: dessert.strMealThumb) {
                         AsyncImage(url: url) { image in
@@ -60,12 +71,14 @@ struct DetailView: View {
                         .padding()
                     }
                     
-                    Text("Instructions").font(.headline)
-                    Text(meal.strInstructions)
-                    Text("Ingredients").font(.headline)
+                    Text("Instructions").font(.headline).padding(.horizontal)
+                    Text(meal.strInstructions).padding(.horizontal)
+                    Spacer()
+                    Spacer()
+                    Text("Ingredients").font(.headline).padding(.horizontal)
                     
                     ForEach(meal.ingredients, id: \.self) {
-                        Ingredient in Text("\(Ingredient.name): \(Ingredient.measure)")
+                        Ingredient in Text("\(Ingredient.name): \(Ingredient.measure)").padding(.horizontal)
                     }
                     
                     Spacer()
@@ -76,7 +89,6 @@ struct DetailView: View {
                 }
             }
             .padding(.horizontal)
-            .navigationTitle(dessert.strMeal)
             .onAppear {
                 viewModel.fetchMealDetail(by: dessert.idMeal)
             }
