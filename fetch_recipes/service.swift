@@ -28,35 +28,52 @@ struct MealDetail: Codable {
     let strMeal: String
     let strInstructions: String
     let strMealThumb: String
+    let ingredients: [Ingredient]
     
-    var ingredients: [Ingredient] {
+    private enum CodingKeys: String, CodingKey {
+        case idMeal, strMeal, strInstructions, strMealThumb
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        idMeal = try container.decode(String.self, forKey: .idMeal)
+        strMeal = try container.decode(String.self, forKey: .strMeal)
+        strInstructions = try container.decode(String.self, forKey: .strInstructions)
+        strMealThumb = try container.decode(String.self, forKey: .strMealThumb)
+        
+        let dynamicContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        
         var ingredientsList: [Ingredient] = []
         
-        for i in 1...20 {
-            if let ingredient = self.value(forKey: "strIngredient\(i)") as? String,
-               let measure = self.value(forKey: "strMeasure\(i)") as? String,
-               !ingredient.isEmpty, !measure.isEmpty {
-                ingredientsList.append(Ingredient(name: ingredient, measure: measure))
-            }
+        var index = 1
+        while let ingredientKey = DynamicCodingKeys(stringValue: "strIngredient\(index)"),
+              let measureKey = DynamicCodingKeys(stringValue: "strMeasure\(index)"),
+              dynamicContainer.contains(ingredientKey),
+              dynamicContainer.contains(measureKey),
+              let ingredient = try dynamicContainer.decodeIfPresent(String.self, forKey: ingredientKey),
+              let measure = try dynamicContainer.decodeIfPresent(String.self, forKey: measureKey),
+              !ingredient.isEmpty, !measure.isEmpty {
+            ingredientsList.append(Ingredient(name: ingredient, measure: measure))
+            index += 1
         }
         print("Parsed Ingredients: \(ingredientsList)")
-        return ingredientsList
+        self.ingredients = ingredientsList
     }
     
-    private enum Codingkeys: String, CodingKey {
-        case idMeal, strMeal, strInstructions, strMealThumb
-        case strIngredient1, strIngredient2, strIngredient3, strIngredient4, strIngredient5,
-             strIngredient6, strIngredient7, strIngredient8, strIngredient9, strIngredient10,
-             strIngredient11, strIngredient12, strIngredient13, strIngredient14, strIngredient15,
-             strIngredient16, strIngredient17, strIngredient18, strIngredient19, strIngredient20
-        case strMeasure1, strMeasure2, strMeasure3, strMeasure4, strMeasure5,
-             strMeasure6, strMeasure7, strMeasure8, strMeasure9, strMeasure10,
-             strMeasure11, strMeasure12, strMeasure13, strMeasure14, strMeasure15,
-             strMeasure16, strMeasure17, strMeasure18, strMeasure19, strMeasure20
-    }
-    
-    fileprivate func value(forKey key: String) -> Any? {
-        return Mirror(reflecting: self).children.first { $0.label == key }?.value
+    private struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+        
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+            self.intValue = nil
+        }
+        
+        init?(intValue: Int) {
+            self.intValue = intValue
+            self.stringValue = "\(intValue)"
+        }
     }
 }
 

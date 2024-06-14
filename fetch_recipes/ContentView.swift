@@ -48,10 +48,6 @@ struct DetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if let meal = viewModel.selectedMealDetail {
-                    Text(dessert.strMeal)
-                        .font(.largeTitle)
-                        .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
-                        .padding(.top)
                     
                     if let url = URL(string: dessert.strMealThumb) {
                         AsyncImage(url: url) { image in
