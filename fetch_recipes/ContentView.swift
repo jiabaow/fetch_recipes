@@ -77,15 +77,16 @@ struct DetailView: View {
                     Spacer()
                     Text("Ingredients").font(.headline).padding(.horizontal)
                     
-                    ForEach(meal.ingredients, id: \.self) {
-                        Ingredient in Text("\(Ingredient.name): \(Ingredient.measure)").padding(.horizontal)
+                    ForEach(meal.ingredients, id: \.self) { ingredient in
+                        HStack {
+                            Text(ingredient.name)
+                            Spacer()
+                            Text(ingredient.measure)
+                        }
+                        .padding(.horizontal)
                     }
                     
                     Spacer()
-                } else {
-                    ProgressView().onAppear {
-                        viewModel.fetchMealDetail(by: dessert.idMeal)
-                    }
                 }
             }
             .padding(.horizontal)

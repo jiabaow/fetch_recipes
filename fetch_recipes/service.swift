@@ -34,6 +34,8 @@ struct MealDetail: Codable {
         case idMeal, strMeal, strInstructions, strMealThumb
     }
     
+    //https://matteomanferdini.com/swift-decode-json-dynamic-keys/
+    //https://stackoverflow.com/questions/67924022/how-to-decode-json-that-has-dynamic-key-values-in-swift
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
